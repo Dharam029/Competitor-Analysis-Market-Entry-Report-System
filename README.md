@@ -121,3 +121,10 @@ You can log in to the application using any of the following pre-configured user
 *   **JWT Sessions**: Authorization tokens are passed securely via standard HTTP Headers (`Authorization: Bearer <token>`) and validated statelessly.
 *   **Foreign Key Constraints**: The database model implements robust cascading constraints (`ON DELETE CASCADE` / `ON DELETE SET NULL`) ensuring complete data integrity.
 *   **Git Ignored Assets**: Crucial secrets (`.env`) and local environments (`node_modules`) are fully configured in the `.gitignore` profiles to prevent accidental credential leakage.
+
+
+## 📄 License
+
+MIT
+
+---
