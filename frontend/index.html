@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CompetitorIQ — Real-time Competitor Analysis & Market Entry Report System">
+  <title>CompetitorIQ — Market Analysis Suite</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+</head>
+<body>
+
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="icon-bar-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></symbol>
+    <symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+    <symbol id="icon-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22V12h6v10"/><path d="M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01"/></symbol>
+    <symbol id="icon-microscope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="icon-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.32 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="icon-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+    <symbol id="icon-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></symbol>
+  </svg>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- LOGIN -->
+  <div id="login-overlay">
+    <div class="login-card">
+      <div class="logo-area">
+        <div class="logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>
+          </svg>
+        </div>
+        <h1>CompetitorIQ</h1>
+        <p>Market Analysis Suite</p>
+      </div>
+      <div class="login-error" id="login-error"></div>
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-input" id="login-username" placeholder="Enter username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="login-password" placeholder="Enter password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:var(--sp-md)">Sign In</button>
+      </form>
+      <div class="credential-grid">
+        <div class="credential-card" onclick="document.getElementById('login-username').value='admin';document.getElementById('login-password').value='admin123'">
+          <div class="cred-role">Admin</div>
+          <div class="cred-info">admin / admin123</div>
+        </div>
+        <div class="credential-card" onclick="document.getElementById('login-username').value='analyst';document.getElementById('login-password').value='analyst123'">
+          <div class="cred-role">Analyst</div>
+          <div class="cred-info">analyst / analyst123</div>
+        </div>
+        <div class="credential-card" onclick="document.getElementById('login-username').value='viewer';document.getElementById('login-password').value='viewer123'">
+          <div class="cred-role">Viewer</div>
+          <div class="cred-info">viewer / viewer123</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>
+          </svg>
+        </div>
+        <div class="brand-text"><h2>CompetitorIQ</h2></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <div class="nav-item active" data-page="dashboard">
+          <span class="nav-icon"><svg><use href="#icon-bar-chart"/></svg></span>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="markets">
+          <span class="nav-icon"><svg><use href="#icon-globe"/></svg></span>
+          <span>Markets</span>
+          <span class="nav-badge">0</span>
+        </div>
+        <div class="nav-item" data-page="competitors">
+          <span class="nav-icon"><svg><use href="#icon-building"/></svg></span>
+          <span>Competitors</span>
+          <span class="nav-badge">0</span>
+        </div>
+        <div class="nav-section-label">Analysis</div>
+        <div class="nav-item" data-page="analysis">
+          <span class="nav-icon"><svg><use href="#icon-microscope"/></svg></span>
+          <span>SWOT & Analysis</span>
+        </div>
+        <div class="nav-item" data-page="compare">
+          <span class="nav-icon"><svg><use href="#icon-shuffle"/></svg></span>
+          <span>Live Compare</span>
+          <span class="nav-badge" style="background:var(--accent);color:white">RT</span>
+        </div>
+        <div class="nav-item" data-page="strategies">
+          <span class="nav-icon"><svg><use href="#icon-target"/></svg></span>
+          <span>Strategies</span>
+          <span class="nav-badge">0</span>
+        </div>
+        <div class="nav-item" data-page="reports">
+          <span class="nav-icon"><svg><use href="#icon-file-text"/></svg></span>
+          <span>Reports</span>
+          <span class="nav-badge">0</span>
+        </div>
+        <div class="nav-section-label">System</div>
+        <div class="nav-item" data-page="admin">
+          <span class="nav-icon"><svg><use href="#icon-settings"/></svg></span>
+          <span>Admin</span>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-card">
+          <div class="user-avatar" id="user-avatar-text">AD</div>
+          <div class="user-info">
+            <div class="user-name" id="user-display-name">Admin</div>
+            <div class="user-role" id="user-display-role">admin</div>
+          </div>
+          <button class="btn-logout" id="btn-logout" title="Sign Out">
+            <svg><use href="#icon-log-out"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-title" id="page-title">Dashboard</div>
+          <div class="page-subtitle" id="page-subtitle"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="text-sm text-muted" id="topbar-date"></span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="page-view active" id="page-dashboard"></div>
+      <div class="page-view" id="page-markets"></div>
+      <div class="page-view" id="page-competitors"></div>
+      <div class="page-view" id="page-analysis"></div>
+      <div class="page-view" id="page-compare"></div>
+      <div class="page-view" id="page-strategies"></div>
+      <div class="page-view" id="page-reports"></div>
+      <div class="page-view" id="page-admin"></div>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/socket.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/markets.js"></script>
+  <script src="js/competitors.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/strategies.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/compare.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById('topbar-date').textContent =
+      new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  </script>
+</body>
+</html>

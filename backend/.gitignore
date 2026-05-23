@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Local env files
+.env
+.env.*
+.env.local
+
+# Database
+data/*.db
